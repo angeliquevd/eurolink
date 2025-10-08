@@ -14,7 +14,7 @@
 
         <!-- Filter -->
         <div class="mb-6">
-            <flux:tabs wire:model="statusFilter">
+            <flux:tabs wire:model.live="statusFilter">
                 <flux:tab name="all">All ({{ \App\Models\ProviderRegistration::count() }})</flux:tab>
                 <flux:tab name="pending">Pending ({{ \App\Models\ProviderRegistration::where('status', 'pending')->count() }})</flux:tab>
                 <flux:tab name="approved">Approved ({{ \App\Models\ProviderRegistration::where('status', 'approved')->count() }})</flux:tab>

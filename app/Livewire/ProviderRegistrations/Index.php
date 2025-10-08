@@ -12,6 +12,11 @@ class Index extends Component
 
     public string $statusFilter = 'all'; // all, pending, approved, rejected
 
+    public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function approve(ProviderRegistration $registration, ?string $notes = null): void
     {
         $this->authorize('update', $registration);
