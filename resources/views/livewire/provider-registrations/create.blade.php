@@ -106,7 +106,7 @@
                         required
                     />
 
-                    <flux:checkbox.group wire:model="ai_system_types" label="AI System Types (select all that apply)" class="[&_[data-flux-checkbox][data-checked]_svg]:!text-white dark:[&_[data-flux-checkbox][data-checked]_svg]:!text-white">
+                    <flux:checkbox.group wire:model="ai_system_types" label="AI System Types (select all that apply)" class="[&_[data-flux-checkbox][data-checked]_svg]:!text-zinc-900 dark:[&_[data-flux-checkbox][data-checked]_svg]:!text-white">
                         <flux:checkbox value="general_purpose" label="General Purpose AI" />
                         <flux:checkbox value="high_risk" label="High-Risk AI Systems" />
                         <flux:checkbox value="limited_risk" label="Limited Risk AI Systems" />
