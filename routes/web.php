@@ -27,6 +27,10 @@ Route::middleware([
     Route::get('/announcements', App\Livewire\Announcements\Index::class)->name('announcements.index');
     Route::get('/announcements/create', App\Livewire\Announcements\Create::class)->name('announcements.create');
 
+    // Messages
+    Route::get('/messages', App\Livewire\Messages\Inbox::class)->name('messages.inbox');
+    Route::get('/messages/{message}', App\Livewire\Messages\Show::class)->name('messages.show');
+
     // Inbox (Notifications)
     Route::get('/inbox', App\Livewire\Inbox\Index::class)->name('inbox.index');
 

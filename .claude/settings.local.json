@@ -23,7 +23,9 @@
       "Bash(vendor/bin/pint:*)",
       "Bash(git checkout:*)",
       "mcp__laravel-boost__browser-logs",
-      "mcp__laravel-boost__tinker"
+      "mcp__laravel-boost__tinker",
+      "mcp__laravel-boost__list-available-env-vars",
+      "Bash(npm install:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -106,11 +106,35 @@
                                 @endif
                             </div>
 
+                            <!-- Status History -->
+                            @if($registration->statusHistories->count() > 0)
+                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <flux:text class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status History</flux:text>
+                                    <div class="space-y-2">
+                                        @foreach($registration->statusHistories->sortByDesc('created_at') as $history)
+                                            <div class="text-sm text-gray-600 dark:text-gray-400 pl-3 border-l-2 {{ $history->to_status === 'approved' ? 'border-green-500' : ($history->to_status === 'rejected' ? 'border-red-500' : 'border-yellow-500') }}">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-medium">{{ ucfirst($history->from_status ?? 'new') }} → {{ ucfirst($history->to_status) }}</span>
+                                                    <span>•</span>
+                                                    <span>{{ $history->created_at->format('M d, Y g:i A') }}</span>
+                                                </div>
+                                                @if($history->changedBy)
+                                                    <div>By: {{ $history->changedBy->name }}</div>
+                                                @endif
+                                                @if($history->notes)
+                                                    <div class="mt-1 text-xs">{{ $history->notes }}</div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
                             <!-- Review Info -->
                             @if($registration->reviewed_at)
                                 <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                     <flux:text class="text-sm text-gray-600 dark:text-gray-400">
-                                        <strong>Reviewed by:</strong> {{ $registration->reviewer->name }} on {{ $registration->reviewed_at->format('M d, Y') }}
+                                        <strong>Latest Review by:</strong> {{ $registration->reviewer->name }} on {{ $registration->reviewed_at->format('M d, Y') }}
                                         @if($registration->review_notes)
                                             <br><strong>Notes:</strong> {{ $registration->review_notes }}
                                         @endif
@@ -120,13 +144,55 @@
 
                             <!-- Actions -->
                             @if($registration->isPending() && auth()->user()->isEcStaff())
-                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
-                                    <flux:button wire:click="approve({{ $registration->id }})" variant="primary">
-                                        Approve
-                                    </flux:button>
-                                    <flux:button wire:click="reject({{ $registration->id }})" variant="danger">
-                                        Reject
-                                    </flux:button>
+                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    @if($approvingRegistrationId === $registration->id)
+                                        <!-- Approval Form -->
+                                        <div class="space-y-3">
+                                            <flux:textarea
+                                                wire:model="approvalNotes"
+                                                label="Approval Notes (Optional)"
+                                                placeholder="Add any notes or comments for the provider..."
+                                                rows="3"
+                                            />
+                                            <div class="flex gap-2">
+                                                <flux:button wire:click="approve({{ $registration->id }})" variant="primary">
+                                                    Confirm Approval
+                                                </flux:button>
+                                                <flux:button wire:click="cancelApproval" variant="ghost">
+                                                    Cancel
+                                                </flux:button>
+                                            </div>
+                                        </div>
+                                    @elseif($rejectingRegistrationId === $registration->id)
+                                        <!-- Rejection Form -->
+                                        <div class="space-y-3">
+                                            <flux:textarea
+                                                wire:model="rejectionNotes"
+                                                label="Rejection Reason (Required)"
+                                                placeholder="Explain what needs to be modified or what additional information is required..."
+                                                rows="4"
+                                                required
+                                            />
+                                            <div class="flex gap-2">
+                                                <flux:button wire:click="reject({{ $registration->id }})" variant="danger">
+                                                    Confirm Rejection
+                                                </flux:button>
+                                                <flux:button wire:click="cancelRejection" variant="ghost">
+                                                    Cancel
+                                                </flux:button>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <!-- Action Buttons -->
+                                        <div class="flex gap-2">
+                                            <flux:button wire:click="showApprovalForm({{ $registration->id }})" variant="primary">
+                                                Approve
+                                            </flux:button>
+                                            <flux:button wire:click="showRejectionForm({{ $registration->id }})" variant="danger">
+                                                Reject
+                                            </flux:button>
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
                         </div>
