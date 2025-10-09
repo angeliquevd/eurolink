@@ -25,7 +25,10 @@
       "mcp__laravel-boost__browser-logs",
       "mcp__laravel-boost__tinker",
       "mcp__laravel-boost__list-available-env-vars",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(while read file)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ]
   },
   "enableAllProjectMcpServers": true,

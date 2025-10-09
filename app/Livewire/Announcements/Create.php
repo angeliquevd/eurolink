@@ -8,6 +8,10 @@ class Create extends Component
 {
     public function render()
     {
-        return view('livewire.announcements.create');
+        $user = auth()->user();
+        $spaces = $user->spaces()->orderBy('name')->get();
+
+        return view('livewire.announcements.create')
+            ->layout('layouts.sidebar', ['spaces' => $spaces]);
     }
 }
