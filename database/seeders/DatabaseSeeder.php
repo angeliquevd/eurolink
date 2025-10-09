@@ -49,6 +49,15 @@ class DatabaseSeeder extends Seeder
             'enable_provider_registration' => true,
         ]);
 
+        // Create DSA Office space with provider registration enabled
+        $dsaOffice = \App\Models\Space::factory()->create([
+            'name' => 'DSA Office',
+            'slug' => 'dsa-office',
+            'visibility' => 'public',
+            'description' => 'Digital Services Act Office - Platform registration, content moderation, and digital services compliance',
+            'enable_provider_registration' => true,
+        ]);
+
         // Create other spaces (2 public, 2 private)
         $otherSpaces = collect([
             \App\Models\Space::factory()->create(['visibility' => 'public']),
@@ -98,6 +107,51 @@ class DatabaseSeeder extends Seeder
 
         // Create realistic AI Office threads and discussions
         $this->seedAiOfficeContent($aiOffice, $allAiOfficeMembers, $ecAdmin, $provider, $aiProvider);
+
+        // Add members to DSA Office
+        \App\Models\SpaceMembership::create([
+            'user_id' => $mainUser->id,
+            'space_id' => $dsaOffice->id,
+            'role_in_space' => 'owner',
+        ]);
+
+        \App\Models\SpaceMembership::create([
+            'user_id' => $ecAdmin->id,
+            'space_id' => $dsaOffice->id,
+            'role_in_space' => 'moderator',
+        ]);
+
+        \App\Models\SpaceMembership::create([
+            'user_id' => $provider->id,
+            'space_id' => $dsaOffice->id,
+            'role_in_space' => 'member',
+        ]);
+
+        // Add 12 more members to DSA Office
+        $dsaOfficeMembers = $allUsers->filter(fn($u) => !in_array($u->id, [$mainUser->id, $ecAdmin->id, $provider->id]))
+            ->random(12);
+
+        $dsaOfficeMembers->each(function ($user) use ($dsaOffice) {
+            \App\Models\SpaceMembership::create([
+                'user_id' => $user->id,
+                'space_id' => $dsaOffice->id,
+                'role_in_space' => 'member',
+            ]);
+        });
+
+        $allDsaOfficeMembers = collect([$mainUser, $ecAdmin, $provider])->merge($dsaOfficeMembers);
+
+        // Create realistic DSA Office threads and discussions
+        $this->seedDsaOfficeContent($dsaOffice, $allDsaOfficeMembers, $ecAdmin, $provider);
+
+        // Create announcement for DSA Office
+        \App\Models\Announcement::factory()->create([
+            'space_id' => $dsaOffice->id,
+            'created_by' => $ecAdmin->id,
+            'published_at' => now()->subDays(5),
+            'title' => 'Welcome to the DSA Office',
+            'body' => "Welcome to the Digital Services Act Office on Eurolink.\n\nThis space is dedicated to supporting digital service providers, online platforms, and very large online platforms (VLOPs) in understanding and complying with the DSA requirements.\n\nHere you can:\n\n- Register your platform and understand your DSA obligations\n- Participate in discussions about content moderation and transparency\n- Learn about risk assessment and mitigation requirements\n- Connect with other platform operators and DSA coordinators\n- Stay updated on enforcement actions and guidance\n\nWhether you're a small platform or a VLOP, we're here to help you navigate the DSA landscape and build a safer digital environment for European users.\n\nFor questions or support, please engage with our team in the discussion threads.",
+        ]);
 
         // Create announcement for AI Office
         \App\Models\Announcement::factory()->create([
@@ -349,6 +403,241 @@ class DatabaseSeeder extends Seeder
             'body' => "Yes, the AI Act has extraterritorial reach. If you're placing AI systems on the EU market or your AI system's output is used in the EU, you must comply.\n\n**For non-EU providers, you must:**\n- Designate an authorized representative in the EU (for providers outside EU)\n- This representative handles compliance, documentation, and communication with authorities\n- Full compliance with all relevant AI Act requirements\n\nThe authorized representative must be established in the EU and appointed in writing. They act as your point of contact with authorities and users.\n\nWould you like information on selecting an authorized representative?",
             'created_by' => $ecAdmin->id,
             'created_at' => now()->subHours(12),
+        ]);
+    }
+
+    private function seedDsaOfficeContent($dsaOffice, $members, $ecAdmin, $provider): void
+    {
+        // Thread 1: VLOP Designation and Obligations
+        $thread1 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'VLOP Designation - What are our obligations?',
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(12),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread1->id,
+            'body' => "Our platform has just crossed 45 million monthly active users in the EU. We received a notification that we may be designated as a Very Large Online Platform (VLOP).\n\nWhat additional obligations does this designation bring? We're already compliant with the basic DSA requirements for hosting services.\n\nHow much time do we have to prepare?",
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(12),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread1->id,
+            'body' => "Congratulations on your growth! Being designated as a VLOP comes with enhanced responsibilities:\n\n**Key VLOP obligations:**\n1. **Risk assessment**: Conduct annual systemic risk assessments\n2. **Risk mitigation**: Implement measures to mitigate identified risks\n3. **Independent audit**: Annual compliance audit by independent auditors\n4. **Transparency reporting**: Enhanced reporting every 6 months\n5. **Crisis response mechanism**: Protocols for addressing crises\n6. **Recommender system transparency**: Explain content recommendation algorithms\n7. **Ad repository**: Maintain searchable repository of advertisements\n8. **Data access for researchers**: Provide vetted researchers access to publicly accessible data\n9. **Compliance function**: Dedicated compliance officer and resources\n\nYou have **4 months** from the designation decision to achieve full compliance.\n\nI recommend scheduling a consultation to discuss your specific situation.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(11),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread1->id,
+            'body' => "That's comprehensive! The risk assessment sounds particularly complex. Do you have templates or frameworks we should follow?\n\nAlso, regarding the compliance officer - are there specific qualifications required?",
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(11)->addHours(4),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread1->id,
+            'body' => "Yes, we'll be publishing risk assessment guidelines next month. The framework should cover:\n- Dissemination of illegal content\n- Effects on fundamental rights\n- Electoral processes and civic discourse\n- Public health and minors protection\n- Gender-based violence\n- Actual or foreseeable negative impacts\n\nFor the compliance officer: They should be independent, report directly to management, and have the authority and resources to ensure compliance. No specific certifications required, but expertise in digital services regulation is essential.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(10),
+        ]);
+
+        // Thread 2: Content Moderation Best Practices
+        $thread2 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Content Moderation - Balancing Speed and Accuracy',
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(10),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread2->id,
+            'body' => "We operate a social media platform with about 5 million EU users. Our content moderation team struggles to balance speed with accuracy.\n\nThe DSA requires 'timely' decisions on illegal content reports. What's considered timely? And how do we ensure we're not over-removing content?\n\nWe use a mix of automated tools and human review. Any best practices?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(10),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread2->id,
+            'body' => "Great question. 'Timely' isn't defined with a specific number of days - it depends on:\n- The type of illegal content\n- Urgency and severity\n- Technical and operational capacity\n\n**Best practices we recommend:**\n\n1. **Risk-based prioritization**: Prioritize reports based on severity (child sexual abuse material, terrorism content = highest priority)\n\n2. **Clear escalation paths**: Human review for edge cases and appeals\n\n3. **Transparency in decisions**: Always provide clear reasoning for content removal\n\n4. **Error correction mechanisms**: Easy appeals process for users\n\n5. **Regular training**: Keep moderators updated on laws and platform policies\n\n6. **Automation with oversight**: Use AI tools for initial flagging, but maintain human oversight for final decisions on complex cases\n\n7. **Context matters**: Consider context, especially for satire, news reporting, educational content\n\nRemember: The DSA prohibits general monitoring obligations. You're not required to proactively seek out illegal content, but you must act on reports received.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(9),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread2->id,
+            'body' => "This is helpful! Regarding appeals - what's the timeline for handling appeals? And do we need to provide an out-of-court dispute settlement option?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(9)->addHours(2),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread2->id,
+            'body' => "For appeals: No specific timeline mandated, but should be 'without undue delay' and proportionate to the importance/urgency.\n\nYes, you should offer access to certified out-of-court dispute settlement bodies. Users should be able to challenge:\n- Content removal decisions\n- Account suspension/termination\n- Other restrictions on content visibility\n\nThe dispute settlement body must be independent and impartial. We'll be publishing a list of certified bodies soon.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(8),
+        ]);
+
+        // Thread 3: Transparency Reporting Requirements
+        $thread3 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Transparency Reports - What needs to be included?',
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(8),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread3->id,
+            'body' => "We're preparing our first DSA transparency report. What metrics and information are mandatory?\n\nWe want to be thorough but also ensure we're meeting the minimum requirements. Any guidance on format or structure?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(8),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread3->id,
+            'body' => "Transparency reports must be published at least annually (VLOPs: every 6 months) and include:\n\n**Content moderation information:**\n- Number of orders received from authorities to act against illegal content\n- Number of notices submitted (by type of alleged illegal content)\n- Actions taken based on notices\n- Number of complaints received through internal complaint system\n- Decisions on complaints\n- Use of automated means for content moderation\n- Average time for taking action\n\n**For hosting services, add:**\n- Number of suspensions/terminations\n- Number of items removed or disabled\n\n**For online platforms, also include:**\n- Number of disputes submitted to out-of-court settlement\n- Outcome of dispute settlement\n\n**Format:** Must be publicly available, machine-readable, and accessible. We recommend publishing on your website.\n\nWe're working on a standardized template to make this easier.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(7),
+        ]);
+
+        // Thread 4: Recommender Systems and Algorithm Transparency
+        $thread4 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Recommender Systems - Transparency Requirements',
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(7),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread4->id,
+            'body' => "Our platform uses machine learning algorithms to recommend content to users. Under the DSA, what do we need to disclose about our recommendation systems?\n\nWe're concerned about protecting proprietary algorithms while meeting transparency obligations. Where's the balance?",
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(7),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread4->id,
+            'body' => "You need to provide clear information about:\n\n1. **Main parameters** used in recommender systems\n2. **Options for users** to modify or influence those parameters\n3. **Why content is recommended** to users (at least one option for not based on profiling)\n\n**What to disclose:**\n- Signals/criteria most significant in determining recommendations\n- How user actions influence recommendations\n- If/how user data is used\n\n**What NOT required:**\n- Detailed algorithmic source code\n- Trade secrets or proprietary information\n- Exact weights or formulas\n\n**Key requirement:** Users must have at least one option for content ranking NOT based on profiling (e.g., chronological feed, most popular in general, category-based).\n\nThink of it as explaining 'what' influences recommendations without revealing 'how' the algorithm works technically.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(6),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread4->id,
+            'body' => "That clarifies things! So we could say something like 'Content is recommended based on: your past engagement, content recency, content from accounts you follow, and trending topics' without revealing the exact algorithm?\n\nAnd we need to provide a chronological or non-personalized option?",
+            'created_by' => $provider->id,
+            'created_at' => now()->subDays(6)->addHours(3),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread4->id,
+            'body' => "Exactly! That level of explanation is appropriate. And yes, at least one non-profiled option must be available and easily accessible to users.\n\nFor VLOPs, there's an additional requirement: users should be able to easily access and understand why specific content was recommended to them individually.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        // Thread 5: Trusted Flaggers Program
+        $thread5 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Trusted Flaggers - How does the program work?',
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread5->id,
+            'body' => "The DSA mentions 'trusted flaggers' that platforms should prioritize. How do we identify trusted flaggers? Is there a certification process?\n\nWhat kind of priority treatment are we expected to provide them?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread5->id,
+            'body' => "Trusted flaggers are entities with particular expertise and competence in detecting illegal content. They're awarded this status by Digital Services Coordinators.\n\n**Criteria for trusted flagger status:**\n- Particular expertise and competence\n- Independence from platforms\n- Accuracy of notices submitted\n- Diligent exercise of activities\n- Representation of collective interests\n\n**Your obligations toward trusted flaggers:**\n- Process notices 'without undue delay'\n- Give priority consideration\n- Expedited review process\n- Decisions communicated without delay\n\n**What this means practically:**\n- Set up a dedicated reporting channel for trusted flaggers\n- Faster response times than general user reports\n- Direct communication channels\n- Regular feedback on notices submitted\n\nThe Commission maintains a public database of trusted flaggers. You can check there to verify status.\n\nThis doesn't mean automatically removing content they flag - you still need to assess each notice, but with priority timing.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(4),
+        ]);
+
+        // Thread 6: Online Advertising Transparency
+        $thread6 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Online Advertising - Transparency Requirements',
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(4),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread6->id,
+            'body' => "We display advertisements on our platform. What transparency requirements apply to online advertising under the DSA?\n\nDo we need to build an ad repository? What information needs to be included?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(4),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread6->id,
+            'body' => "All online platforms displaying ads must provide users with clear info for each ad:\n\n**Real-time disclosure (must be visible with the ad):**\n- That it's advertising (clear marking)\n- Who paid for the ad (sponsor)\n- Meaningful info about main parameters determining why the ad was shown to them\n\n**For VLOPs specifically:**\nMust maintain a publicly accessible, searchable **ad repository** containing:\n- Content of the ad\n- Sponsor identity\n- Period of presentation\n- Whether targeted and main parameters\n- Total number of recipients reached\n\nThe repository must keep ads for **1 year** after last display.\n\n**Prohibited:**\n- Ads based on profiling using special categories of data (race, political opinions, religion, health, sexual orientation, etc.)\n- Targeted advertising to minors based on profiling\n\nThis helps users understand why they see certain ads and provides researchers/regulators visibility into ad practices.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(3),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread6->id,
+            'body' => "Regarding 'meaningful info about parameters' - can you give an example of what this looks like in practice?\n\nAnd for the ad repository, does it need to be integrated into our platform or can it be a separate database?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(3)->addHours(2),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread6->id,
+            'body' => "**Example of parameter disclosure:**\n'This ad is shown to you based on: your location (Berlin), your age range (25-34), and that you recently viewed sports content.'\n\nOr: 'This ad is shown to all users in Germany interested in technology.'\n\nIt doesn't need to be exhaustive - just the *main* parameters.\n\n**Ad repository:**\nCan be integrated or separate, as long as it's:\n- Publicly accessible\n- Machine-readable\n- Searchable (by keywords, advertiser, date range, etc.)\n- Accessible via API is recommended for researcher access\n\nMany platforms create a dedicated subdomain (e.g., ads.yourplatform.com) for this purpose.",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(2),
+        ]);
+
+        // Thread 7: Cross-border Cooperation and Enforcement
+        $thread7 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Multi-country Operations - Which DSA coordinator applies?',
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(2),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread7->id,
+            'body' => "Our platform operates across multiple EU member states. We have offices in Ireland, Germany, and the Netherlands.\n\nWhich Digital Services Coordinator (DSC) has jurisdiction over us? Do we need to work with multiple DSCs?\n\nHow does cross-border enforcement work?",
+            'created_by' => $members->random()->id,
+            'created_at' => now()->subDays(2),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread7->id,
+            'body' => "Good question! The DSA uses a **country of establishment** principle:\n\n**Your 'home' DSC** is in the Member State where your main establishment is located (where you make principal decisions about service provision).\n\n**For VLOPs/VLOSEs:**\nThe European Commission has direct supervisory and enforcement powers, though your DSC of establishment remains your primary contact.\n\n**Cross-border mechanism:**\n- Your DSC of establishment is your main point of contact\n- Other Member States can request your DSC to investigate\n- DSCs cooperate through the European Board for Digital Services\n- All DSCs can request information and conduct investigations in urgent cases\n\n**Your obligations:**\n- Designate a single point of contact (legal representative in your country of establishment)\n- Respond to all DSCs when requested\n- Only one DSC can impose penalties for the same conduct (coordination mechanism)\n\nIn practice: Identify your main establishment, notify that DSC, and they'll guide you on coordination with other authorities.\n\nWhere do you make your principal strategic decisions?",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        // Thread 8: Protection of Minors
+        $thread8 = \App\Models\Thread::create([
+            'space_id' => $dsaOffice->id,
+            'title' => 'Protection of Minors - Age Verification and Safety',
+            'created_by' => $provider->id,
+            'created_at' => now()->subHours(20),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread8->id,
+            'body' => "Our platform is accessible to minors. What are our obligations under the DSA regarding child safety?\n\nDo we need age verification? Are there restrictions on recommender systems or advertising for minors?",
+            'created_by' => $provider->id,
+            'created_at' => now()->subHours(20),
+        ]);
+
+        \App\Models\Post::create([
+            'thread_id' => $thread8->id,
+            'body' => "The DSA has specific provisions for protecting minors:\n\n**All platforms accessible to minors must:**\n1. Take appropriate measures to ensure high level of privacy, safety, and security for minors\n2. Not present ads based on profiling using minors' personal data\n\n**VLOPs accessible to minors must:**\n1. Assess systemic risks specifically related to minors\n2. Put in place appropriate mitigation measures\n3. Design systems with safety by design principles\n\n**Best practices (not legally required but recommended):**\n- Age-appropriate content moderation\n- Enhanced privacy defaults for minor accounts\n- Parental controls\n- Easy reporting mechanisms for child safety concerns\n- Staff training on child safety\n\n**Age verification:**\nThe DSA doesn't mandate specific age verification, but you need *reasonable efforts* to:\n- Identify minor users to apply protections\n- Prevent profiling for ads\n- Apply appropriate safety measures\n\nMany platforms use age gates, parental consent mechanisms, or age estimation technologies.\n\n**Important:** Any age verification must itself comply with GDPR and minimize data collection.\n\nWhat type of content/services does your platform provide?",
+            'created_by' => $ecAdmin->id,
+            'created_at' => now()->subHours(14),
         ]);
     }
 }
