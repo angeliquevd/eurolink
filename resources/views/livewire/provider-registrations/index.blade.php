@@ -2,8 +2,8 @@
     <div class="py-6 px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-6">
-            <flux:heading size="xl" class="mb-1">Provider Registrations</flux:heading>
-            <flux:subheading>Review and manage AI provider registration submissions</flux:subheading>
+            <flux:heading size="xl" class="mb-1">Platform Registrations</flux:heading>
+            <flux:subheading>Review and manage platform registration submissions</flux:subheading>
         </div>
 
         @if (session()->has('message'))
@@ -74,7 +74,7 @@
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <flux:text class="text-sm font-medium text-gray-700 dark:text-gray-300">AI Systems</flux:text>
+                                    <flux:text class="text-sm font-medium text-gray-700 dark:text-gray-300">Platform Services</flux:text>
                                     <flux:text class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                         {{ $registration->ai_systems_description }}
                                     </flux:text>
@@ -206,7 +206,7 @@
                         </svg>
                         <flux:heading size="lg" class="mb-2">No registrations found</flux:heading>
                         <flux:text class="text-gray-500 dark:text-gray-400">
-                            {{ $statusFilter === 'all' ? 'No provider registrations have been submitted yet.' : 'No ' . $statusFilter . ' registrations found.' }}
+                            {{ $statusFilter === 'all' ? 'No platform registrations have been submitted yet.' : 'No ' . $statusFilter . ' registrations found.' }}
                         </flux:text>
                     </div>
                 </flux:card>

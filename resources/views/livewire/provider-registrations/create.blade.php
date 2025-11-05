@@ -12,8 +12,8 @@
 
         <!-- Header -->
         <div class="mb-8">
-            <flux:heading size="xl" class="mb-2">AI Provider Registration</flux:heading>
-            <flux:subheading>Register your company as an AI provider with the European Commission</flux:subheading>
+            <flux:heading size="xl" class="mb-2">Platform Registration</flux:heading>
+            <flux:subheading>Register your platform with the European Commission</flux:subheading>
         </div>
 
         <form wire:submit="submit">
@@ -93,30 +93,30 @@
                 </div>
             </flux:card>
 
-            <!-- AI Systems Information -->
+            <!-- Platform Services Information -->
             <flux:card class="mb-6">
-                <flux:heading size="lg" class="mb-4">AI Systems Information</flux:heading>
+                <flux:heading size="lg" class="mb-4">Platform Services Information</flux:heading>
 
                 <div class="space-y-4">
                     <flux:textarea
                         wire:model="ai_systems_description"
-                        label="AI Systems Description"
-                        placeholder="Describe the AI systems your company develops or deploys..."
+                        label="Platform Services Description"
+                        placeholder="Describe the services your platform provides..."
                         rows="4"
                         required
                     />
 
-                    <flux:checkbox.group wire:model="ai_system_types" label="AI System Types (select all that apply)" class="[&_[data-flux-checkbox][data-checked]_svg]:!text-zinc-900 dark:[&_[data-flux-checkbox][data-checked]_svg]:!text-white">
-                        <flux:checkbox value="general_purpose" label="General Purpose AI" />
-                        <flux:checkbox value="high_risk" label="High-Risk AI Systems" />
-                        <flux:checkbox value="limited_risk" label="Limited Risk AI Systems" />
-                        <flux:checkbox value="minimal_risk" label="Minimal Risk AI Systems" />
+                    <flux:checkbox.group wire:model="ai_system_types" label="Service Types (select all that apply)" class="[&_[data-flux-checkbox][data-checked]_svg]:!text-zinc-900 dark:[&_[data-flux-checkbox][data-checked]_svg]:!text-white">
+                        <flux:checkbox value="general_purpose" label="General Purpose Services" />
+                        <flux:checkbox value="high_risk" label="High-Risk Services" />
+                        <flux:checkbox value="limited_risk" label="Limited Risk Services" />
+                        <flux:checkbox value="minimal_risk" label="Minimal Risk Services" />
                     </flux:checkbox.group>
 
                     <flux:textarea
                         wire:model="intended_use_cases"
                         label="Intended Use Cases"
-                        placeholder="Describe the primary use cases and applications of your AI systems..."
+                        placeholder="Describe the primary use cases and applications of your platform services..."
                         rows="4"
                     />
                 </div>

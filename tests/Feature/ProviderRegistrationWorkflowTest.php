@@ -212,8 +212,8 @@ test('provider registration shows on space page when enabled', function () {
     $this->actingAs($user);
 
     Livewire::test(\App\Livewire\Spaces\Show::class, ['space' => $space])
-        ->assertSee('Register as Provider')
-        ->assertSee('AI Provider Registration Available');
+        ->assertSee('Register Platform')
+        ->assertSee('Platform Registration');
 });
 
 test('provider registration does not show on space page when disabled', function () {
@@ -224,8 +224,8 @@ test('provider registration does not show on space page when disabled', function
     $this->actingAs($user);
 
     Livewire::test(\App\Livewire\Spaces\Show::class, ['space' => $space])
-        ->assertDontSee('Register as Provider')
-        ->assertDontSee('AI Provider Registration Available');
+        ->assertDontSee('Register Platform')
+        ->assertDontSee('Platform Registration');
 });
 
 test('registration form pre-fills contact information from authenticated user', function () {

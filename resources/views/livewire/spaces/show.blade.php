@@ -14,7 +14,7 @@
             <div class="flex gap-2">
                 @if($space->hasProviderRegistration())
                     <flux:button href="{{ route('provider-registrations.create', $space) }}" variant="primary">
-                        Register as Provider
+                        Register Platform
                     </flux:button>
                 @endif
                 @can('create', App\Models\Thread::class)
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <!-- Provider Registration Info -->
+        <!-- Platform Registration Info -->
         @if($space->hasProviderRegistration())
             <flux:card class="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
                 <div class="flex items-start gap-4">
@@ -35,9 +35,9 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <flux:heading size="lg" class="mb-2 text-blue-900 dark:text-blue-100">AI Provider Registration Available</flux:heading>
+                        <flux:heading size="lg" class="mb-2 text-blue-900 dark:text-blue-100">Platform Registration</flux:heading>
                         <flux:text class="text-blue-800 dark:text-blue-200 mb-3">
-                            Register your company as an AI provider with the European Commission. The registration will be reviewed by EC staff and you will be notified of the outcome.
+                            Register your platform with the European Commission. The registration will be reviewed by EC staff and you will be notified of the outcome.
                         </flux:text>
                         <flux:button href="{{ route('provider-registrations.create', $space) }}" variant="primary">
                             Start Registration →
